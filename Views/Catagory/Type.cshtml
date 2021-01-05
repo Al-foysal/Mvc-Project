@@ -1,0 +1,25 @@
+﻿@model IEnumerable<M7_Project_05.Models.ProductType>
+@{
+    ViewBag.Title = "Type";
+}
+
+<h2>Product Type of @ViewBag.Catagories</h2>
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.ProductTypeId)</th>
+            <th>@Html.DisplayNameFor(x => x.Name)</th>          
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(x => c.ProductTypeId)</td>
+                <td>@Html.DisplayFor(x => c.Name)</td>              
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.ActionLink("Back to Catagory List", "Index")
+

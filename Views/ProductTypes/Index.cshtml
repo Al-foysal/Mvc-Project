@@ -1,0 +1,75 @@
+﻿@model IEnumerable<M7_Project_05.Models.ProductType>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h5 class="offset-3 col-6 offset-3">Product Type</h5>
+
+<div class="d-flex justify-content-end mb-1 mt-3">
+    @using (Html.BeginForm())
+    {
+    <div class="input-group mr-1">
+        @Html.TextBox("searchString")
+        <div class="input-group-append">
+            <button type="submit" placeholder="Type" class="btn btn-primary btn-sm"><i class="fa fa-search"></i></button>
+        </div>
+    </div>
+    }
+    @Html.ActionLink("Create New", "Create", new { }, new { @class = "btn btn-primary btn-sm ml-2" })
+</div>
+<table class="table">
+    <tr>
+        <th>
+            @Html.ActionLink("ProductTypeId", "Index", new { sortOrder = ViewBag.NameSortParm })
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Catagory)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductTypeId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Catagory.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.ProductTypeId }, new { @class = "btn btn-outline-secondary" })
+            @Html.ActionLink("Details", "Details", new { id = item.ProductTypeId }, new { @class = "btn btn-info" })
+            @Html.ActionLink("Delete", "Delete", new { id = item.ProductTypeId }, new { @class = "btn btn-danger" })
+            @Html.ActionLink("Product", "Product", "ProductTypes", new { id = item.ProductTypeId }, new { @class = "btn btn-success" })
+        </td>
+    </tr>
+}
+
+</table>
+<div class="d-flex justify-content-end">
+    <ul class="pagination pagination-sm">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            if (i == ViewBag.CurrentPage)
+            {
+                <li class="page-item active">
+                    @Html.ActionLink(i.ToString(), "Index", "ProductTypes", new { page = i }, new { @class = "page-link" })
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    @Html.ActionLink(i.ToString(), "Index", "ProductTypes", new { page = i }, new { @class = "page-link" })
+                </li>
+            }
+
+        }
+    </ul>
+</div>

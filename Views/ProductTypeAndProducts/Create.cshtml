@@ -1,0 +1,189 @@
+﻿@model M7_Project_05.Models.ProductType
+@{
+    ViewBag.Title = "Create";
+}
+
+@using (Html.BeginForm("CreatePost", "ProductTypeAndProducts", FormMethod.Post, new { id = "feq", onesubmit = "javascript:return false;" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div role="alert" id="alert" class="alert alert-suceess" style="display:none">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="alert-heading" id="msg-heading">Result</h4>
+                <p id="msg"></p>
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <h4 class="text-info">ProductType</h4>
+            <div>
+                @Html.LabelFor(x => x.CatagoryId, new { @class="text-info"})
+                @Html.DropDownListFor(x => x.CatagoryId, new SelectList(ViewBag.Catagories, "CatagoryId", "Name"), "Select type", new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.CatagoryId, "", new { @class = "text-danger" })
+            </div>
+            <div>
+                @Html.LabelFor(x => x.Name, new { @class = "text-info" })
+                @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.Name, "", new { @class = "text-danger" })
+            </div>
+
+        </div>
+        <div class="col-8">
+            <h4 class="text-secondary">Products</h4>
+            <table class="table table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Sr #</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Purchase Date</th>
+                        <th>Stock</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tbpro"></tbody>
+            </table>
+            <div class="form-inline">
+                <label class="sr-only" for="ProductName">Product Name</label>
+                <input type="Text" class="form-control mb-2 mr-sm-2" name="ProductName" id="ProductName" placeholder="Product Name">
+                <label class="sr-only" for="Price">Price</label>
+                <input type="Text" class="form-control mb-2 mr-sm-2" name="Price" id="Price" placeholder="Price">
+                <label class="sr-only" for="PurchaseDate">Purchase Date</label>
+                <input type="Text" class="form-control mb-2 mr-sm-2" name="PurchaseDate" id="PurchaseDate" placeholder="PurchaseDate">
+                <label class="sr-only" for="Stock">Stock</label>
+                <input type="Text" class="form-control mb-2 mr-sm-2" name="Stock" id="Stock" placeholder="Stock">
+                <button type="button" id="addproduct" class="btn btn-primary btn-sm mb-2">Add</button>
+            </div>
+        </div>
+        <div class="col-12 mt-2">
+            <div class="d-flex justify-content-lg-start">
+                <button type="button" class="btn btn-primary" id="save">Save All</button>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script>
+        var productType = {
+            Name: "",
+            CatagoryId: 0,
+            Products: []
+        }
+        $(document).ready(function () {
+            for (var i = 0; i < productType.Products.length; i++) {
+                    $("#tbpro").append(`<tr>
+                                            <td>${i + 1}</td>
+                                            <td >${productType.Products[i].ProductName}</td >
+                                            <td >${productType.Products[i].Price}</td>
+                                            <td >${productType.Products[i].PurchaseDate}</td>
+                                            <td >${productType.Products[i].Stock}</td>
+                                            <td><button data-act='del'  data-index='${i}' type="button" class='btn btn-primary btn-sm del'>&times;</button>
+                                    </tr>`);
+            }
+            $("button[data-act='del']").addClass('btn btn-info btn-sm del');
+            $("#addproduct").click(function () {
+                productType.Products.push({ ProductName: $("#ProductName").val(), Price: $("#Price").val(), PurchaseDate: $("#PurchaseDate").val(), Stock: $("#Stock").val() })
+                $("#tbpro").append(`<tr>
+                                            <td>${productType.Products.length}</td>
+                                            <td >${$("#ProductName").val()}</td>
+                                            <td >${$("#Price").val()}</td>
+                                            <td >${$("#PurchaseDate").val()}</td>
+                                            <td >${$("#Stock").val()}</td>
+                                            <td><button data-act='del' data-index='${productType.Products.length - 1}' type='button" class='btn btn-primary btn-sm del'>&times;</button>
+                                    </tr>`);
+                $("button[data-act='del']").addClass('btn btn-info btn-sm del')
+            })
+            $("#save").click(function (evt) {
+                //alert("Save");
+                evt.preventDefault();
+                evt.stopPropagation();
+                if ($("#feq").valid()) {
+                    console.log('Ok');
+
+                    productType.CatagoryId = $("#CatagoryId").val();
+                    productType.Name = $("#Name").val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CreatePost", "ProductTypeAndProducts")",
+
+                        data: productType,
+                        dataType: "json"
+                    }).done(function (r) {
+                        console.log(r);
+                        if (r.success == true) {
+                            $("#alert").removeClass("alert-warning").addClass("alert-success").show();
+                            $("#msg-heading").html("Success");
+                            $("#msg").html(r.message);
+                            $("#feq").trigger("reset");
+                            productType = {
+                                Name: "",
+                                Name: "",
+                                CatagoryId: 0,
+                                Products: []
+                            }
+                            $("#tbpro").empty();
+                            $("#tbpro").append("<tr><td colspan='6'></td></tr>");
+
+                        }
+                        else {
+                            $("#alert").removeClass("alert-success").addClass("alert-warning").show();
+                            $("#msg-heading").html("Error");
+                            $("#msg").html(r.message);
+                        }
+
+                    }).fail(function (err) {
+                        console.log(err);
+                    });
+                }
+                else {
+                    console.log('Not Ok');
+                    if (productType.Products.length == 0) {
+
+                    }
+                }
+            })
+            $('body').on("click", "button.del", function (evt) {
+
+                var b = $(this);
+                var tr = b.closest('tr');
+                var i = b.data("index");
+                console.log(i);
+                tr.remove();
+                productType.Products.splice(i, 1);
+                console.log(productType.Products);
+                $("#tbpro").empty();
+                if (productType.Products.length == 0) {
+                    $("#tbpro").append("<tr><td colspan='4'>No Parts added.</td></tr>");
+                }
+                else {
+                    for (var i = 0; i < productType.Products.length; i++) {
+                        $("#tbpro").append(`<tr>
+                                            <td>${i + 1}</td>
+                                            <td >${productType.Products[i].PartName}</td >
+                                            <td >${$("#ProductName").val()}</td>
+                                            <td >${$("#Price").val()}</td>
+                                            <td >${$("#PurchaseDate").val()}</td>
+                                            <td >${$("#Stock").val()}</td>
+                                            <td><button data-act='del'  data-index='${i}' type="button" class='btn btn-primary btn-sm del'>&times;</button>
+                                    </tr>`);
+                    }
+                    $("button[data-act='del']").addClass('btn btn-info btn-sm del');
+                }
+                evt.preventDefault();
+
+            })
+
+
+        })
+    </script>
+}
+

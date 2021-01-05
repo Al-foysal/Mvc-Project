@@ -1,0 +1,103 @@
+﻿@model IEnumerable<M7_Project_05.Models.Catagory>
+@{
+                /**/
+
+                /**/
+
+                ViewBag.Title = "Details List";
+}
+
+<div class="d-flex justify-content-end mt-2 mb-1">
+    @Html.ActionLink("Add ProductType and Product", "Create", "ProductTypeAndProducts", new { }, new { @class = "btn btn-outline-primary btn-sm" })
+</div>
+    <table class="table table-bordered table-info">
+        <thead class="thead-dark">
+            <tr>
+                <th>Catagory Id</th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.CatagoryId</td>
+                    <td>@t.Name</td>
+                    <td><button type="button" class="btn btn-outline-success rounded-circle select" data-sellerid="@t.CatagoryId"><i class="fa fa-plus"></i></button></td>
+                </tr>
+                <tr style="display:none" id="@("productType" + t.CatagoryId)">
+                    <td colspan="3">
+                        <table class="table table-bordered table-secondary">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ProductType Id</th>
+                                    <th>Product Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eq in t.ProductTypes)
+                                {
+                                    <tr>
+                                        <td>@eq.ProductTypeId</td>
+                                        <td>@eq.Name</td>                                     
+                                        <td>
+                                            <button type="button" class="btn btn-outline-success rounded-circle buy" data-productid="@eq.ProductTypeId"><i class="fa fa-plus-square"></i></button>        
+                                        </td>
+                                    </tr>
+                                    <tr style="display:none" id="@("products" + eq.ProductTypeId)">
+                                        <td colspan="7">
+                                            <table class="table table-bordered table-success">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Product Id</th>
+                                                        <th>Product Name</th>
+                                                        <th>Price</th>
+                                                        <th>Purchase Date</th>
+                                                        <th>Stock</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var b in eq.Products)
+                                                    {
+                                                        <tr>
+                                                            <td>@b.ProductId</td>
+                                                            <td>@b.ProductName</td>
+                                                            <td>@b.Price.ToString("0Tk")</td>
+                                                            <td>@b.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                                                            <td>@b.Stock</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @section styles{
+        <link href="~/Content/font-awesome.css" rel="stylesheet" />
+    }
+    @section scripts{
+        <script>
+            $(document).ready(function () {
+                $("button.select").click(function () {
+                    var tid = $(this).data("sellerid");
+                    $("#productType" + tid).toggle();
+                    $(this).find("i").toggleClass("fa-plus fa-minus");
+                });
+                $("button.buy").click(function () {
+                    var pid = $(this).data("productid");
+                    $("#products" + pid).toggle();
+                    $(this).find("i").toggleClass("fa-plus-square fa-minus-square");
+                });
+            });
+        </script>
+    }
+
